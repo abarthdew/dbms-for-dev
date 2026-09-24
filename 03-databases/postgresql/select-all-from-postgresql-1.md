@@ -1,10 +1,3 @@
----
-title: SELECT 1.* FROM PostgreSQL;
-date: 2022-04-08
-categories: [DB, RDBMS]
-tags: [DB, PostgreSQL]
----
-
 # 1. 특징
 
 ## 1) 포스트그레스큐엘이란?

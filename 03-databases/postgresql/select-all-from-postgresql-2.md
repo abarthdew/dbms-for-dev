@@ -1,10 +1,3 @@
----
-title: SELECT 2.* FROM PostgreSQL;
-date: 2022-04-08
-categories: [DB, RDBMS]
-tags: [DB, PostgreSQL]
----
-
 # 2. ORACLE vs PostgreSQL
 
 | 속성 | ORACLE | PostgreSQL |
