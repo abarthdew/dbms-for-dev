@@ -34,12 +34,15 @@
 | [🚩](#8-User-Concepts) User Concepts | Access privileges<br>according to SQL standards | Access privileges<br>according to SQL standards |
 
 ### 1. `Secondary Indexes`
+
 > 💡 Secondary indexes
 
 ### 2. `Partitioning Methods`
+
 > 💡 Dividing a table based on specific partitioning criteria (e.g., gender, date) into horizontal partitions (partitioning by records)
 > ### Oracle Partitioned Table
 > Partitioning functionality in Oracle is not available in the `STANDARD` version (`PERSONAL`, `ENTERPRISE EDITION` only)
+>
 > - (1) Range: Divides the table into units based on a range (e.g., date)
 >
 > ```jsx
@@ -126,12 +129,19 @@
 > ) PARTITION BY RANGE(dt);
 > 					-- [RANGE | LIST | HASH]
 > ```
+>
 > ![Untitled](./images/12.png)
+>
 > - `PARTITION BY RANGE(id)`: RANGE Partition based on the id range
+>
 >    Example of partition_bound_spec setting: FOR VALUES FROM (1) to (1000)
+>
 > - `PARTITION BY LIST(class)`: LIST Partition based on the class column
+>
 >    Example of partition_bound_spec setting: FOR VALUES IN ('G', 'V')
+>
 > - `PARTITION BY HASH(id)`: HASH Partition based on the id column
+>
 >    Example of partition_bound_spec setting: FOR VALUES WITH (MODULUS 10, REMAINDER 5)
 >
 > - (2) Create CHILD table
@@ -170,10 +180,13 @@
 >
 
 ### 3. `Replication method`
+
 > 💡 Method of duplicating data across multiple nodes
 
 ### 4. `MapReduce`
+
 > 💡 A software framework introduced by Google in 2004 for distributed parallel computing, designed to handle large-scale data processing.
+>
 > It consists of Map and Reduce processes:<br>
 > `Input` (Data Input)<br>
 > → `Splitting` (Breaking down data and storing it in HDFS)<br>
@@ -184,20 +197,24 @@
 > [[Source]](https://songsunbi.tistory.com/5)
 
 ### 5. `Concurrency`
+
 > 💡 Support for simultaneous data manipulation
 
 ### 6. `Durability`
+
 > 💡 Support for persistent data generation
 
 ### 7. `In-Memory Features`
+
 > 💡 Option to store some or all structures only in memory
 
 ### 8. `User Concepts`
+
 > 💡 Access control
 
 # 3. Installation
-> [Install PostgreSQL](https://www.postgresql.org/download/windows/)
 
+> [Install PostgreSQL](https://www.postgresql.org/download/windows/)
 
 🔰 **Files Installed Inside the PostgreSQL Data Directory**
 
@@ -509,7 +526,9 @@ SELECT '00:15:00'::TIME; // 00:15:00
 ```
 
 ### 3. `COALESCE(<parameter1>, <parameter2>,...)`
+
 > 💡 Difference with Oracle
+>
 > - Oracle: NVL(hire_date, SYSDATE) - Implicit type conversion occurs if types do not match
 > - PostgreSQL: COALESCE(hire_date, SYSDATE) - Error if column types do not match (constants are OK)
 >
@@ -545,7 +564,9 @@ SELECT '00:15:00'::TIME; // 00:15:00
 > ```
 
 ### 4. `NULLIF(<parameter1>, <parameter2>,...)`
+
 > 💡 Returns NULL if <parameter1> equals <parameter2>,
+>
 > Returns <parameter1> if <parameter1> does not equal <parameter2>.
 >
 > ```jsx
@@ -568,7 +589,6 @@ SELECT '00:15:00'::TIME; // 00:15:00
 | date_trunc() | Removes unnecessary date information | SELECT date_trunc('month', now());<br>// Returns "2021-03-01 00:00:00+09"<br>// (At the time of execution: 2021-03-04) |
 
 - EXTRACT field values
-
 
     | CENTURY | Century |
     | --- | --- |
@@ -617,7 +637,9 @@ CONNECT BY PRIOR DEP_CD = PARENT_CD; -- Connect parent and child nodes
 ```
 
 ### 7. `TEXT(Data Type)`
+
 > 💡 What is CLOB?
+>
 > - According to the CUBRID manual, it is described as follows: In simple terms, it is a data type for storing large-sized data in external files.
 > - Used for storing string data externally in the database.
 > - The maximum length of CLOB data is determined by the file size that can be generated in external storage.
@@ -1173,10 +1195,14 @@ CREATE INDEX [index_name] ON [table_name] UNING HASH([column_name]);
 - Useful for searching strings contained within the original values.
 
 > 💡 Difference between B-Tree and GIN Index
+>
 > `B-tree Index`
+>
 > - Utilizes the original value without transforming the values of the indexed column.
 > - Effective for searches involving operations on the value itself, such as equality comparisons, but less applicable to operations like %LIKE%, which check if the search term is contained in the data value.
+>
 > `GIN (Generalized Inverted Index) Index`
+>
 > - Divides (splits) the values of the indexed column according to certain rules.
 > - Can operate more effectively when checking for inclusion, compared to cases where such checks are less applicable with B-Tree indexes.
 
@@ -1189,9 +1215,11 @@ CREATE INDEX gin_name_idx ON patients USING gin (to_tsvector(['Language'], [colu
 ```
 
 > 💡 `to_tsvector` :  A function that converts to a vector.
+>
 > When a long text is converted to a tsvector, only meaningful words remain. Connecting words such as "a," "the," "on," and the like are not extracted. To search for words in the converted content, the function to_tsquery is used.
 >
 > **(Example) Vectorizing a long text in English from the 'content' column and searching for words afterward.**
+>
 > ```jsx
 > SELECT id, title FROM boards
 > WHERE to_tsvector('english', content) @@ to_tsquery('time');
@@ -1236,6 +1264,7 @@ LINE 1: SELECT * FROM view_order2;
 - **Types:** PL/pgSQL, PL/TCL, PL/Perl, PL/Python, etc.
 
 > 💡 To use stored procedures, the following language installation process is required (after connecting to the DB):
+>
 > ```jsx
 > CREATE LANGUAGE <language name>;
 > ```
@@ -1401,6 +1430,7 @@ SELECT * FROM sub_number; -- Output: 3
 >
 > - Similar to a procedure that automatically executes when a specified event occurs.
 > - Can be invoked without explicit calls, triggered in response to DDL, DML, or certain DB operations (LOGOFF, SHUTDOWN).
+>
 >     Example: Creating an insert trigger on the incoming table would automatically update the inventory quantity in the product table when data is added to the table.
 >
 > **User-Defined Function**
@@ -1427,6 +1457,7 @@ SELECT * FROM sub_number; -- Output: 3
     - MVCC (Multi-Version Concurrency Control)
 
         [[1]](https://mangkyu.tistory.com/53)Multi-Version Concurrency Control, one of the methods used to control concurrency in databases that allow simultaneous access. [[2]](http://www.datanet.co.kr/news/articleView.html?idxno=116534)A mechanism that ensures write sessions and read sessions do not block each other and guarantees snapshot images when different sessions access the same data. The changed content is recorded in the UNDO area, and users read the last version of the data.
+
     - [Row Level Locking](https://offbyone.tistory.com/225): Table Locking involves locking the entire table when a query is performed, while Row Level Locking involves locking only the row when data is modified.
     - [Locking](https://raisonde.tistory.com/entry/%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4-%EB%A1%9C%ED%82%B9Locking-%EA%B8%B0%EB%B2%95%EA%B3%BC-%EB%A1%9C%ED%82%B9-%EB%8B%A8%EC%9C%84): A unit that allows only one person to use at a time.
     - [Blocking](https://chrisjune-13837.medium.com/db-lock-%EB%9D%BD%EC%9D%B4%EB%9E%80-%EB%AC%B4%EC%97%87%EC%9D%B8%EA%B0%80-d908296d0279)
@@ -1435,6 +1466,7 @@ SELECT * FROM sub_number; -- Output: 3
     - `Table Space`
 
         [[1]](https://blogger.pe.kr/504?category=144029) A concept used only in Oracle and PostgreSQL. In psql, the DB uses the directory specified in the PGDATA environment variable as the DB, and tables are created as files under it. In other words, even without creating a separate table space, you can create user tables in the directory specified as the DB. In conclusion, the entire directory specified as the DB is recognized as a default table space. (*The path in the file system where the objects of the database can be stored by the DB administrator) [[2]](https://hotte.tistory.com/1)Physical space where database objects are stored on the file system. By using Table Space, it is possible to use storage differently according to the purpose of the database, and it can also be used for purposes such as disaster response and recovery. [[Official]](https://postgresql.kr/docs/9.6/manage-ag-tablespaces.html)Allows the database administrator to define the location of the file system where the file representing the database object can be stored.
+
     - Host-based Authentication: Authentication based on the host (a computer connected to the network with an IP address) [[1]](https://heaven9598.tistory.com/entry/SSH-Secure-Shell)[[2]](https://webcache.googleusercontent.com/search?q=cache:yMPnxh0r2pcJ:https://postgresql.kr/docs/9.6/auth-pg-hba-conf.html+&cd=2&hl=ko&ct=clnk&gl=kr&client=firefox-b-e)[[3]](https://info-lab.tistory.com/51)
     - [Host-based Intrusion Detection System (HIDS)](https://en.wikipedia.org/wiki/Host-based_intrusion_detection_system): Emphasizes monitoring and analyzing the internal activities of a computer system.
 
@@ -1550,6 +1582,7 @@ SELECT * FROM sub_number; -- Output: 3
   
 #### Joins
 - [Join Types](https://felixgrayson.wordpress.com/2015/06/18/left-join-right-join-inner-join-and-outer-join/)
+
   ![Join Types](./images/29.png)
 
 #### GIN Index
