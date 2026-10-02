@@ -25,6 +25,7 @@ Database study notes, grouped by topic in numbered directories:
   - [postgresql/select-all-from-postgresql-2](03-databases/postgresql/select-all-from-postgresql-2.md)
   - [postgresql/select-all-from-postgresql-2_eng](03-databases/postgresql/select-all-from-postgresql-2_eng.md)
   - [redis/overview](03-databases/redis/overview.md)
+  - [redis/redis-cli-and-nodejs](03-databases/redis/redis-cli-and-nodejs.md)
   - [sql-server/README](03-databases/sql-server/README.md)
   - [sqlite/overview](03-databases/sqlite/overview.md)
 - [04-projects/](04-projects/)
