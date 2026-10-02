@@ -173,6 +173,7 @@ PUT /articles
 ```
 
 **필드 타입:**
+
 - `text`: 전문 검색 (분석됨, 토큰화)
 - `keyword`: 정확한 매칭 (분석 안 됨)
 - `integer`, `long`: 숫자

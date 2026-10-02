@@ -3,13 +3,13 @@
 ## 1) What is PostgreSQL?
 
 ![Untitled](./images/1.png)
+
 >    <br>
 > 🛢 Oracle<br>
 > 🗄 MS SQL Server<br>
 > 🐬 MySQL<br>
 > 🐘 PostgreSQL  ← NEW!!<br>
 >    <br>
-
 
 ## 2) History
 
@@ -44,8 +44,11 @@
 ### `Secure(보안)`
 
 - [Data encryption](https://webcache.googleusercontent.com/search?q=cache:AFa24t-xkSYJ:https://postgresql.kr/docs/11/encryption-options.html+&cd=2&hl=ko&ct=clnk&gl=kr&client=firefox-b-e), Access control, [
+
 Log audit](https://webcache.googleusercontent.com/search?q=cache:edv21ZxF6k4J:https://postgresql.kr/docs/9.6/runtime-config-logging.html+&cd=9&hl=ko&ct=clnk&gl=kr&client=firefox-b-e) :Three aspects of DB security
+
 Three aspects of DB security:
+
 - Host-based authentication, Object-level permissions, Encryption of transmitted data between clients and the network through SSL communication
 
 ### `Recovery & Availability(복구, 이용)`
@@ -123,10 +126,12 @@ SELECT * FROM pg_tables;
 | 13441 | template0 |
 
 > 💡 **CREATE DATABASE actually works by copying an existing database.**
+>
 > `template1`: The table copied by default when using CREATE DATABASE command.
 >   - Users can modify elements in the template1 table itself.
 >   - Subsequent tables created will have the elements from template1 table copied as is.
 >   - For example, if PL/pgSQL procedural language is installed in template1, it can be used in tables created later.
+>
 > `template0`: Has the same data as the initial state of template1.
 >   - Therefore, if you want to create a new database with the user-defined elements added to template1, you can copy from template0 after making changes.
 
@@ -156,19 +161,28 @@ REVOKE privilege [,...]
 ```
 
 > 💡 [Detailed options](https://wiki.kldp.org/KoreanDoc/html/PgSQL_Extension-KLDP/PgSQL_Extension-KLDP-2.html)
+>
 > - `privilege`
+>
 >    SELECT: Grant/revoke access to specific columns of a TABLE/VIEW.
+>
 >    INSERT: Grant/revoke permission to insert data into all columns of a specific TABLE.
+>
 >    UPDATE: Grant/revoke permission to update all columns of a specific TABLE.
+>
 >    DELETE: Grant/revoke permission to delete rows from a specific TABLE.
+>
 >    RULE: Grant/revoke permission to define rules for a specific TABLE/VIEW.
+>
 >    ALL: Grant/revoke all privileges.
+>
 > - `object` : Applicable objects include tables, views, sequences, and indexes.
 > - `PUBLIC` : Grant/revoke permissions to all users.
 
 ![Untitled](./images/5.png)
 
 > 💡 When trying to access tables in another account's database, the following errors may occur:
+>
 > ```shell
 > ERROR:  relation "public.users" does not exist
 > LINE 1: SELECT * FROM public.users;
@@ -242,6 +256,7 @@ REVOKE privilege [,...]
 - Flexible operations can be performed by setting a savepoint.
 
 > 💡 **Details**
+>
 > - Transaction operations in PostgreSQL: Use BEGIN before and COMMIT after the operations.
 > ```jsx
 > BEGIN;
@@ -251,6 +266,7 @@ REVOKE privilege [,...]
 > -- etc, etc
 > COMMIT;
 > ```
+>
 > - Setting a savepoint:
 > ```jsx
 > BEGIN;
@@ -272,11 +288,13 @@ REVOKE privilege [,...]
 - Rules creation allows for extension of SELECT, INSERT, UPDATE, DELETE operations.
 
 > 💡 Rarely used due to operational issues; currently replaced by triggers.
+>
 > ```jsx
 > CREATE [ OR REPLACE ] RULE name AS ON event
 >     TO table_name [ WHERE condition ]
 >     DO [ ALSO | INSTEAD ] { NOTHING | command | ( command ; command ... ) }
 > ```
+>
 > - `name`: Rule name
 > - `event`: One of SELECT, INSERT, UPDATE, DELETE operations
 > - `table_name`: Name of the table or view to apply the rule to
@@ -303,6 +321,7 @@ REVOKE privilege [,...]
 - GiST Method Index: An index provided by PostgreSQL that supports various indexing options, such as geometric data and text search documents.
 
 > 💡 [Reference materials](https://webcache.googleusercontent.com/search?q=cache:teayQF99WcsJ:https://postgresql.kr/docs/11/sql-createindex.html+&cd=3&hl=ko&ct=clnk&gl=kr&client=firefox-b-e)
+
 ```jsx
 // Index Creation
 CREATE [ UNIQUE ] INDEX [ CONCURRENTLY ] [ [ IF NOT EXISTS ] name ] ON [ ONLY ] table_name [ USING index_method ]
@@ -329,7 +348,9 @@ CREATE [ UNIQUE ] INDEX [ CONCURRENTLY ] [ [ IF NOT EXISTS ] name ] ON [ ONLY ] 
 > ```
 >
 > When a table is created in the corresponding database, the storage of the tablespace is used to store files representing the database objects.<br>
+>
 > ![Untitled](./images/8.png)
+>
 > ```jsx
 > SELECT
 >   pg_database.dattablespace AS dtspcoid, datname, pg_database.oid,
@@ -388,6 +409,7 @@ CREATE [ UNIQUE ] INDEX [ CONCURRENTLY ] [ [ IF NOT EXISTS ] name ] ON [ ONLY ] 
 > ```
 
 ### 6. `Auto-increment (sequences): 자동 증가(시퀀스)`
+
 > 💡 [Example of SEQUENCE](https://aspdotnet.tistory.com/2401)
 > ### SEQUENCE
 > ```jsx
@@ -508,6 +530,7 @@ CREATE [ UNIQUE ] INDEX [ CONCURRENTLY ] [ [ IF NOT EXISTS ] name ] ON [ ONLY ] 
 > → 😧 Would operating a standby server improve availability?<<br>
 > → 🧐 If so, the data on the operational server and the standby server must match.<br>
 > → 😮 Replication is necessary!
+>
 > = `warm standby`, or `log shipping` feature
 >
 > ✔️ Both the operational server and the standby server must be running.<br>
@@ -530,17 +553,22 @@ CREATE [ UNIQUE ] INDEX [ CONCURRENTLY ] [ [ IF NOT EXISTS ] name ] ON [ ONLY ] 
 >
 > # 2. Streaming Replication
 > 💡 **Streaming-Replication** : Streaming-Replication: A replication method that delivers WAL logs generated by the Master to the Slave DB in real-time to synchronize integrity.<br>
+>
 > ![Untitled](./images/9.png)
 >
 > # 3. More Detailed Article on PostgreSQL Replication
 > - Test environment: CentOS 7.5, PostgreSQL 10.4 version
 >
 > ## **1-1) WAL-Write Ahead Log**
+
 - Generates logs for all operations on the master server.
 - Sends the generated logs to the standby server.
 - Restores (re-executes) the received logs on the standby server.<br>
+
 > 💡 This operation creates a replication server with the same schema as the master server.
+>
 > – The logs on the master server are called WAL and are stored in $install_path/data/pg_xlog.
+>
 > – The installation path in the manual is /usr/local/pgsql/data.
 >
 > ## **1-2) WAL Delivery Method**
@@ -564,11 +592,13 @@ CREATE [ UNIQUE ] INDEX [ CONCURRENTLY ] [ [ IF NOT EXISTS ] name ] ON [ ONLY ] 
 > ```jsx
 > # postgres= create role repluser with replication password ‘password’ login;
 > ```
+>
 > - Set the access permissions for the created account.
 > ```jsx
 > # vim /usr/local/pgsql/data/pg_hba.conf
 > host replication repluser [Standby Server ip]/32 trust
 > ```
+>
 > - Configuration for replication.
 > ```jsx
 > listen_addresses = '*' # Authentication/authorization management is set in pg_hba.conf file
@@ -587,12 +617,14 @@ CREATE [ UNIQUE ] INDEX [ CONCURRENTLY ] [ [ IF NOT EXISTS ] name ] ON [ ONLY ] 
 > # pg_basebackup -h [Master Server ip] -D /usr/local/pgsql/data
 > -U repluser -v -P –wal-method=stream
 > ```
+>
 > - Configuring WAL content in streaming mode:
 > ```jsx
 > # vim /usr/local/pgsql/data/postgresql.conf
 > listen_addresses = ‘*’
 > hot_standby = on # Allowing read-only operations on the standby server
 > ```
+>
 > - Additionally, create a `recovery.conf` file in the same path as the `postgresql.conf` file. 
 > - Connect to the master server and receive WAL content in real-time using the information from the `primary_conninfo` option.
 > ```jsx
@@ -604,7 +636,9 @@ CREATE [ UNIQUE ] INDEX [ CONCURRENTLY ] [ [ IF NOT EXISTS ] name ] ON [ ONLY ] 
 >
 > ### **2-3) Configuration Verification**
 > - After completing the configuration for the master and standby servers, start the daemons for the master server and standby server sequentially.
+>
 > [Master Server Running Status]
+>
 > ```jsx
 > # ps -ef |grep postgres
 > postgres 596 32676 0 05:46 ? 00:00:00 postgres: wal sender process repluser 115.68.x.x(56100) streaming 0/3000140
@@ -656,6 +690,7 @@ CREATE [ UNIQUE ] INDEX [ CONCURRENTLY ] [ [ IF NOT EXISTS ] name ] ON [ ONLY ] 
 > archive_command = 'scp -i /usr/local/pgsql/.ssh/id_rsa %p postgres@[Standby Server IP]:/usr/local/pgsql/archives/%f'
 > archive_timeout = 30
 > ```
+>
 > - %p represents the full path of the archive (WAL) file, and %f is the file name.
 >
 > ### **3-3) Confirmation of Configuration**
@@ -670,6 +705,7 @@ CREATE [ UNIQUE ] INDEX [ CONCURRENTLY ] [ [ IF NOT EXISTS ] name ] ON [ ONLY ] 
 > -rw——- 1 postgres postgres 16777216 Aug 13 09:09 000000010000000000000009
 > -rw——- 1 postgres postgres 16777216 Aug 13 09:14 00000001000000000000000A
 > ```
+>
 > PostgreSQL Execution Script
 >
 > - When installing PostgreSQL from source, daemon execution must be done using the pg_ctl command.
@@ -724,6 +760,7 @@ CREATE [ UNIQUE ] INDEX [ CONCURRENTLY ] [ [ IF NOT EXISTS ] name ] ON [ ONLY ] 
 - Specifies the connection type, client IP address range (if applicable to the connection type), database name, username, and authentication method in each record of the pg_hba.conf configuration file stored within the database cluster for connections.
 
 > 💡 [pg_hba.conf Record and Field Detail](https://postgresql.kr/docs/9.6/auth-pg-hba-conf.html)
+>
 > ```jsx
 > local      database  user  auth-method  [auth-options]
 > host       database  user  address  auth-method  [auth-options]
@@ -804,6 +841,7 @@ CREATE [ UNIQUE ] INDEX [ CONCURRENTLY ] [ [ IF NOT EXISTS ] name ] ON [ ONLY ] 
 - The table inheriting from another is referred to as the child table, while the table being inherited from is the parent table.
 
 > 💡 Details[[1]](https://corekms.tistory.com/entry/table-inheritance%EC%83%81%EC%86%8D)[[2]](https://www.postgresql.org/docs/10/> tutorial-inheritance.html)
+>
 > ```jsx
 > // parents table
 > CREATE TABLE cities (

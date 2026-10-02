@@ -31,6 +31,7 @@ $ redis-cli // cli 실행
     // `"type": "module"`은 Node.js 프로젝트에서 ECMAScript 모듈 시스템을 사용하겠다는 것을 나타내는 설정입니다. 기존에는 CommonJS 형식이 기본이었지만, ECMAScript 2015 (ES6)부터 도입된 모듈 시스템을 사용하고자 할 때 이 설정을 추가합니다.
     // 이 설정을 사용하면, 파일 확장자 `.js` 파일도 기본적으로 ES 모듈로 취급됩니다. CommonJS 형식의 `require` 대신에 `import/export` 구문을 사용할 수 있게 됩니다. 이를 통해 더 모던하고 간결한 코드를 작성할 수 있습니다.
     ```
+
   - hello.js
     ```javascript
     import { createClient } from "redis"; // 1
@@ -50,6 +51,7 @@ $ redis-cli // cli 실행
         client.quit();
       })();
     ```
+
 - require: common js 방식
   - package.json에 위 module type 제거
   - hello.js
@@ -71,6 +73,7 @@ $ redis-cli // cli 실행
         client.quit();
     })();
     ```
+
     ```javascript
     // 3
     const redis = require('redis'); // 1
@@ -103,6 +106,7 @@ $ redis-cli // cli 실행
     });
   }
   ```
+
   ```javascript
   async function showResults(id, recieveClient) {
     const client = await recieveClient;
@@ -126,7 +130,9 @@ $ redis-cli // cli 실행
     console.log('The article "' + replies[0] + '" has', replies[1], 'votes');
   }
   ```
+
   > 위 결과: TypeError: client.mget is not a function
+
 - 답변
   - `client` 객체가 `mget` 메서드를 지원하지 않기 때문에 발생. `mget` 메서드는 Redis 클라이언트의 기본 메서드 중 하나가 아님.
     ```javascript
@@ -147,6 +153,7 @@ $ redis-cli // cli 실행
       console.log('The article "' + headline + '" has', votes, 'votes');
     }
     ```
+
   - 이렇게 수정하면 `client.get`을 사용하여 각 키에 대한 값을 얻어올 수 있음. 위 코드는 `Promise.all`을 사용하여 두 개의 비동기 작업을 병렬로 수행하고, 그 결과를 배열로 받아오게 됨. 이후 각 값에 접근하여 적절한 로그를 출력.
 
 ### export 파일에 함수를 선언과 동시에 실행하고 싶을 때

@@ -32,6 +32,7 @@
 | [🚩](#8-사용자-개념) 사용자 개념 | SQL 표준에 따라 세분화된<br>액세스 권한 | SQL 표준에 따라 세분화된<br>액세스 권한 |
 
 ### 1. `보조인덱스`
+
 > 💡 Secondary indexes
 
 ### 2. `파티셔닝 방법`
@@ -39,8 +40,9 @@
 > 💡 하나의 테이블을 특정 분할 기준(ex. 여, 남, 날짜)에 따라 수평 분할(레코드로 분할)하는 것
 > ### 오라클 파티션 테이블
 > 오라클 파티션 기능은 `STANDARD`버전일 경우 불가(`PERSONAL`, `ENTERPRISE EDITION` 만 가능)
+>
 > - (1) Range : 범위 단위로 나누어진 테이블(ex. 날짜)
-> 
+>
 > ```jsx
 > -- 파티션 기준 설정 & 테이블 생성
 > CREATE TABLE mypart (
@@ -55,7 +57,7 @@
 >     PARTITION my_q2 VALUES LESS THAN (2017, 01, 01) TABLESPACE TEST_TBS2,
 >     PARTITION my_q3 VALUES LESS THAN (2017, 07, 01) TABLESPACE TEST_TBS3
 >    );
-> 
+>
 > -- 데이터 삽입
 > INSERT INTO mypart VALUES(1, 2016, 01, 03, 'scott');
 > INSERT INTO mypart VALUES(2, 2017, 05, 17, 'jones');
@@ -64,15 +66,15 @@
 > INSERT INTO mypart VALUES(5, 2016, 11, 04, 'lion');
 > INSERT INTO mypart VALUES(6, 2016, 12, 21, 'tiger');
 > COMMIT;
-> 
+>
 > -- 데이터 조회
 > SELECT my_value FROM mypart PARTITION (my_q1); -- scott, ford
 > SELECT my_value FROM mypart PARTITION (my_q2); -- lion, tiger
 > SELECT my_value FROM mypart PARTITION (my_q3); -- jones, miller
 > ```
-> 
+>
 > - (2) List : 특정 컬럼 값을 기준으로 파티셔닝을 수행
-> 
+>
 > ```jsx
 > -- 생성
 > CREATE TABLE emp_list_pt (
@@ -89,7 +91,7 @@
 > 	PARTITION emp_list_pt2 VALUES ('SALESMAN') TABLESPACE TEST_TBS2,
 > 	PARTITION emp_list_pt3 VALUES ('ANALYST') TABLESPACE TEST_TBS3,
 > 	PARTITION emp_list_pt4 VALUES ('PRESIDENT', 'CLERK') TABLESPACE TEST_TBS4);
-> 
+>
 > -- 데이터 삽입
 > INSERT INTO emp_list_pt VALUES(1, 'SMITH',  'CLERK',     7902, SYSDATE,  800, NULL, 20);
 > INSERT INTO emp_list_pt VALUES(2, 'ALLEN',  'SALESMAN',  7698, SYSDATE, 1600,  300, 30);
@@ -106,16 +108,16 @@
 > INSERT INTO emp_list_pt VALUES(13, 'FORD',   'ANALYST',   7566, SYSDATE,  3000, NULL, 20);
 > INSERT INTO emp_list_pt VALUES(14, 'MILLER', 'CLERK',     7782,  SYSDATE, 1300, NULL, 10);
 > COMMIT;
-> 
+>
 > -- emp_list_pt1의 데이터 조회
 > SELECT ename FROM emp_list_pt PARTITION (emp_list_pt1); -- JONES, BLAKE, CLAR
 > ```
-> 
+>
 > - (3) Hash : 데이터를 해시 알고리즘에 의해 무작위로 분산시켜 삽입
 >
 > ### 포스트그레스큐엘 파티션 테이블
 > 10 버전 이전에는 상속을 이용한 구현으로 상속 하는 테이블과 받는 테이블 사이에 `trigger`를 걸어서 서로를 연결하는 번거로운 방법을 사용해야 했지만, 10버전 이후 `parent-child` 형태로 단순하게 사용이 가능해짐
-> 
+>
 > - (1) 파티션 PARENT 생성
 > ```jsx
 > CREATE TABLE test.test_partitioned (
@@ -125,54 +127,64 @@
 > ) PARTITION BY RANGE(dt);
 > 					-- [RANGE | LIST | HASH]
 > ```
-> ![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/12.png){: width="150" style="margin-bottom: 40px; margin-right: 10px;" .left}   
+>
+> ![Untitled](./images/12.png)   
+>
 > - `PARTITION BY RANGE(id)` : id 범위를 기준으로 한 RANGE  Partition 
+>
 >    partition_bound_spec 설정 예 : FOR VALUES FROM (1) to (1000)
+>
 > - `PARTITION BY LIST(class)` : class column을 기준으로 한 LIST Partition 
+>
 >    partition_bound_spec 설정 예 : FOR VALUES IN ('G', 'V')
+>
 > - `PARTITION BY HASH(id)` : id column을 기준으로 한 HASH Partition
+>
 >    partition_bound_spec 설정 예 : FOR VALUES WITH (MODULUS 10, REMAINDER 5)
 >
 > - (2) CHILD 테이블 생성
-> 
+>
 > ```jsx
 > CREATE TABLE test.test_2019_01
 > 	PARTITION OF test.test_partitioned
 > 	FOR VALUES
 > 	FROM ('2019-01-01') to ('2019-02-01');
-> 
+>
 > CREATE TABLE test.test_2019_02
 > 	PARTITION OF test.test_partitioned
 > 	FOR VALUES
 > 	FROM ('2019-02-01') to ('2019-03-01');
-> 
+>
 > CREATE TABLE test.test_default
 > 	PARTITION OF test.test_partitioned
 > 	DEFAULT;
 > ```
 >
-> ![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/13.png){: width="400"}   
-> 
+> ![Untitled](./images/13.png)   
+>
 > - (3) 데이터 삽입
-> 
+>
 > ```jsx
 > INSERT INTO test.test_partitioned VALUES ('2019-01-10', 'message...', 10);
 > ```
-> 
+>
 > - (4) 파티션 삭제
-> 
+>
 > ```jsx
 > ALTER TABLE test.test_partitioned DETACH PARTITION test.test_2019_02;
 > ```
-> 
+>
 > 💡 [[오라클]](https://m.blog.naver.com/PostView.nhn?blogId=whdahek&logNo=220796458477&proxyReferer=https:%2F%2Fwww.google.com%2F)> [포스트그레스큐엘[[1]](https://semode.tistory.com/466)[[2]](https://browndwarf.tistory.com/36)[(공식)](https://www.postgresql.org/docs/10/> ddl-partitioning.html)[(상속-트리거 방식)](https://antop.tistory.com/entry/Postgresql-Partitioning)]
-> 
+>
 
 ### 3. `복제 방법`
+
 > 💡 여러 노드에 데이터를 중복 저장하는 방법
 
 ### 4. `맵리듀스`
+
 > 💡 구글에서 대용량 데이터 처리를 분산 병렬 컴퓨팅에서 처리하기 위한 목적으로 제작하여 2004년 발표한 소프트웨어 프레임워크.
+>
 > 맵(Map)+리듀스(Reduce)로 이루어져 있으며,<br>
 > `Input`(데이터 입력)<br>
 > → `Splitting`(데이터를 쪼개 HDFS에 저장)<br>
@@ -183,20 +195,24 @@
 > [[출처]](https://songsunbi.tistory.com/5)
 
 ### 5. `동시성`
+
 > 💡 동시 데이터 조작 지원
 
 ### 6. `지속성`
+
 > 💡 지속적인 데이터 생성 지원
 
 ### 7. `메모리 내 기능`
+
 > 💡 일부 또는 모든 구조를 메모리에만 보관할 수 있는 옵션이 있는지
 
 ### 8. `사용자 개념`
+
 > 💡 접근 제어
 
 # 3. 설치
+
 > [PostgreSQL 설치하기](https://www.postgresql.org/download/windows/)
-{: .prompt-info }
 
 🔰 **PostgreSQ\ data 디렉토리 내부에 설치되는 파일**
 
@@ -212,7 +228,7 @@
 
 - 제어판 > 시스템 > 고급 시스템 설정 > 환경 변수 > 시스템변수 > path편집
 
-![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/14.png)
+![Untitled](./images/14.png)
 
 # 5. 접속
 
@@ -225,7 +241,7 @@
 
 3. pgAdmin4(전용 GUI 툴)
 
-![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/15.png)
+![Untitled](./images/15.png)
 
 # 6. CRUD
 
@@ -240,13 +256,13 @@
 
 ### 1) CREATE | `CREATE TABLE [tb_name] ([컬럼명][자료형],...);`
 
-![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/16.png)
+![Untitled](./images/16.png)
 
 1. SQL shell에 차례대로 입력 *구문 오류가 있을 시, 오류 문구가 출력됨
 2. \e 명령어 입력
 3. 외부 편집기로 쿼리 수정 후 저장
 
-![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/17.png)
+![Untitled](./images/17.png)
 
 ```jsx
 -- 기존 테이블 복사 후 생성(칼럼, 레코드 데이터 복사됨)
@@ -278,7 +294,7 @@ id |  name  |                             attributes
 
 ### 2) SELECT | `SELECT * FROM "[schema_name]".[tb_name];`
 
-![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/18.png)
+![Untitled](./images/18.png)
 
 ---
 
@@ -293,13 +309,13 @@ UPDATE [tb_name] SET [column] = [values] WHERE [condition] [RETURNING *];
 -- RETURNING * : 수정한 내용 바로 조회
 ```
 
-![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/19.png)
+![Untitled](./images/19.png)
 
 ---
 
 ### 4) DELETE | `DROP TABLE [tb_name]`
 
-![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/20.png)
+![Untitled](./images/20.png)
 
 # 7. 자료형
 
@@ -368,7 +384,7 @@ INSERT INTO info3 VALUES (001, 'POST', Array[01011111111, 01022222222]);
 INSERT INTO info3 VALUES (002, 'POST2', '{01011111111, 01022222222}');
 ```
 
-![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/21.png)
+![Untitled](./images/21.png)
 
 🔰 JSON형 : `JOSN` / `JSONB`
 
@@ -394,7 +410,7 @@ INSERT INTO order3 VALUES
   (003, '{"custormer":"333", "books":{"id":"c", "name":"cBook"}}');
 ```
 
-![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/22.png)
+![Untitled](./images/22.png)
 
 # 8. 활용
 
@@ -508,15 +524,17 @@ SELECT '00:15:00'::TIME; // 00:15:00
 ```
 
 ### 3. `COALESCE(<매개변수1>, <매개변수2>,...)`
+
 > 💡 오라클과의 차이점
+>
 > - oracle : NVL(hire_date, SYSDATE) - 타입 불일치 시 묵시적 형변환 발생
 > - postgresql : COALESCE(hire_date, SYSDATE) - 컬럼타입 불일치 시 오류(상수는 OK)
-> 
+>
 > ```jsx
 > SELECT COALESCE(null, null, null, '빈 값') AS column1; // 빈값
 > SELECT COALESCE(null, 1); // 1
 > ```
-> 
+>
 > ```jsx
 > postgres=# SELECT * FROM test;
 > // 결과
@@ -529,7 +547,7 @@ SELECT '00:15:00'::TIME; // 00:15:00
 >   5
 >  null
 > (6개 행)
-> 
+>
 > postgres=# SELECT COALESCE(id, 0) AS col1 FROM test;
 > // 결과
 > col1
@@ -544,9 +562,11 @@ SELECT '00:15:00'::TIME; // 00:15:00
 > ```
 
 ### 4. `NULLIF(<매개변수1>, <매개변수2>,...)`
+
 > 💡 <매개변수1> = <매개변수2> : NULL 반환
+>
 > <매개변수1> != <매개변수2> : <매개변수1>반환
-> 
+>
 > ```jsx
 > SELECT NULLIF(20, 20); // NULL
 > SELECT NULLIF(22, 23); // 22
@@ -616,7 +636,9 @@ CONNECT BY PRIOR DEP_CD = PARENT_CD;--부모노드와 자식노드 연결
 ```
 
 ### 7. `TEXT(데이터 타입)`
+
 > 💡 CLOB 이란?
+>
 > - CUBRID의 매뉴얼에는 아래와 같이 나와 있다. 간단하게 설명하면, 사이즈가 큰 데이터를 외부 파일로 저장하기 위한 데이터 타입이다.
 > -  문자열 데이터를 DB 외부에 저장하기 위한 타입이다.
 > -  CLOB 데이터의 최대 길이는 외부 저장소에서 생성 가능한 파일 크기이다.
@@ -881,7 +903,7 @@ FROM order3
 
 ## 2) 조인
 
-![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/23.png)
+![Untitled](./images/23.png)
 
 ### INNER JOIN
 
@@ -974,11 +996,11 @@ QUERY PLAN
 
 🔰 PgAdmin
 
-![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/24.png)
+![Untitled](./images/24.png)
 
-![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/25.png)
+![Untitled](./images/25.png)
 
-![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/26.png)
+![Untitled](./images/26.png)
 
 ### LEFT OUTER JOIN
 
@@ -1116,7 +1138,7 @@ dtspcoid |  datname  |  oid  | spcoid |   spcname    | spcowner
 
 ### B-Tree 인덱스
 
-![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/27.png)
+![Untitled](./images/27.png)
 
 - 자식 노드의 최대 숫자가 2보다 큰 트리 구조.
 - 각 노드에 있는 키들은 전부 정렬되어 있으며, 부모-자식 노드가 연결되어 있다.
@@ -1172,10 +1194,14 @@ CREATE INDEX [index_name] ON [table_name] UNING HASH([column_name]);
 - 원래의 값 내에 포함된 문자열을 검색하는 데 유용함.
 
 > 💡 B-Tree와 GIN 인덱스의 차이점
+>
 > `B-tree 인덱스` 
+>
 > - 인덱스를 적용하는 컬럼의 값을 변형하지 않고 원래의 값을 이용
 > - 연산과 같은 값 자체에 대한 탐색에는 효과적이지만 %LIKE% 연산과 같이 검색어가 데이터 값에 포함 되었는지 여부를 확인하는 것에는 적용되기 어려움.
+>
 > `GIN (Generalized Inverted Index) 인덱스`
+>
 > - 인덱스를 적용하는 컬럼의 값을 일정한 규칙에 따라 쪼개고(split), 이렇게 쪼갠 요소들을 사용. 
 > - 이에 따라 포함 여부를 확인하는 경우 보다 효과적으로 동작할 수 있음.
 
@@ -1188,9 +1214,11 @@ CREATE INDEX gin_name_idx ON patients USING gin (to_tsvector(['Language'], [colu
 ```
 
 > 💡 `to_tsvector` : 벡터로 변환해 주는 함수.
+>
 > tsvector로 긴 글을 변환하면 의미를 갖는 단어만 남게 된다. a, the, on과 같은 연결하는 단어는 추출되지 않는다. 변환된 내용에서 단어를 검색하기 위해선 to_tsquery라는 함수를 사용한다.
-> 
+>
 > **(예시) content 칼럼 속 영어로 된 긴 글을 벡터라이징 한 후 단어 검색**
+>
 > ```jsx
 > SELECT id, title FROM boards 
 > WHERE to_tsvector('english', content) @@ to_tsquery('time');
@@ -1235,6 +1263,7 @@ LINE 1: SELECT * FROM view_order2;
 - 종류 : PL/pgSQL, PL/TCL, PL/Perl, PL/Python 등.
 
 > 💡 프로시저 사용을 위해서는 다음과 같이 언어를 설치하는 과정이 필요(DB접속 후 설치)
+>
 > ```jsx
 > CREATE LANGUAGE <언어 이름>
 > ```
@@ -1394,28 +1423,30 @@ SELECT * FROM sub_number; // 3
 ```
 
 > 💡 **프로시저 함수, 트리거, 사용자 정의 함수의 차이**
-> 
+>
 > `프로시저`
-> 
+>
 > - 어떤 작업에 대한 절차적 일괄처리 작업에 사용.
 > - 반복적인 트랜잭션을 수행할 수 있는 PL/SQL 블록.
 > - DB내에 미리 컴파일되어 저장되어 있다가 필요할 시 매번 사용 가능.
-> 
+>
 > `트리거`
-> 
+>
 > - 지정된 이벤트 발생시 자동으로 실행되는 프로시저와 같은 것.
 > - 명시적으로 호출 필요없이 DDL, DML 또는 일부 DB 작업(LOGOFF, SHUTDOWN)에 대한 응답으로 호출 가능.
+>
 >     Ex) 입고 테이블에 insert 트리거를 작성하면, 테이블에 자료 추가될 때 
+>
 >     상품 테이블에 재고 수량이 되도록 트리거를 작성한다.
-> 
+>
 > `사용자정의함수`
-> 
+>
 > - 프로시저와 차이는 리턴값의 유무. 
 > - 프로시저는 수행하는 절차가 목적이라 리턴값이 없어도 되지만,  함수는 결과 도출이 목적이기에 리턴값이 존재한다. 단 하나의 리턴값만 있어야 한다.
 
 # 10. 질문과 보충사항
 
-![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/28.png)
+![Untitled](./images/28.png)
 
 > 💡 감사합니다. 질문과 보충했으면 좋을 것 같은 사항들을 말씀해주세요.
 
@@ -1532,7 +1563,7 @@ SELECT * FROM sub_number; // 3
     - [CLOB](https://www.cubrid.com/tutorial/3794112) : 사이즈가 큰 데이터를 외부 파일로 저장하기 위한 데이터 타입(오라클)
     - [조인](https://felixgrayson.wordpress.com/2015/06/18/left-join-right-join-inner-join-and-outer-join/)
     
-    ![Untitled](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/PostgreSQL/images/29.png)
+    ![Untitled](./images/29.png)
     
     - [GIN인덱스](https://medium.com/vuno-sw-dev/postgresql-gin-%EC%9D%B8%EB%8D%B1%EC%8A%A4%EB%A5%BC-%ED%86%B5%ED%95%9C-like-%EA%B2%80%EC%83%89-%EC%84%B1%EB%8A%A5-%EA%B0%9C%EC%84%A0-3c6b05c7e75f)
     - [to_tsvector](https://daesuni.github.io/postgres-fulltext-search/)

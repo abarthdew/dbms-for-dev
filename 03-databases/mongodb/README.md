@@ -47,12 +47,14 @@
 ---
 
 - MongoDB Compass
-![ex_screenshot](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/MongoDB/images/MongoDB_Compass.png)
+
+![ex_screenshot](./images/MongoDB_Compass.png)
 
 ---
   
 - 환경변수 등록
-![ex_screenshot](https://raw.githubusercontent.com/abarthdew/dbms-for-dev/main/MongoDB/images/환경변수.png)
+
+![ex_screenshot](./images/환경변수.png)
 
 ---
 
