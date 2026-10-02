@@ -18,11 +18,11 @@ tcp6       0      0 ::1:6379                :::*                    LISTEN
 $ redis-cli // cli 실행
 ```
 
-# Node.js + Redis
+## Node.js + Redis
 
-## chapter 1
+### chapter 1
 
-### hello.js
+#### hello.js
 
 - import: 모듈 방식(ES6)
   - package.json에 추가 필요
@@ -90,7 +90,7 @@ $ redis-cli // cli 실행
       })();
     ```
 
-### articles-popularity.js
+#### articles-popularity.js
 
 - *showResult error*
   ```javascript
@@ -149,7 +149,7 @@ $ redis-cli // cli 실행
     ```
   - 이렇게 수정하면 `client.get`을 사용하여 각 키에 대한 값을 얻어올 수 있음. 위 코드는 `Promise.all`을 사용하여 두 개의 비동기 작업을 병렬로 수행하고, 그 결과를 배열로 받아오게 됨. 이후 각 값에 접근하여 적절한 로그를 출력.
 
-## export 파일에 함수를 선언과 동시에 실행하고 싶을 때
+### export 파일에 함수를 선언과 동시에 실행하고 싶을 때
 
 - 파일 내에서 함수가 선언되면 해당 함수는 그 자체의 스코프에 존재합니다. 따라서 파일 내에서 함수를 선언했다고 해서 자동으로 실행되지 않음.
 - 즉시 실행 예시 코드 - 파일이 실행되면서 함수가 즉시 실행되고, 그 결과로 객체가 생성되어 export 됨.
